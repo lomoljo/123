@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
-  name: hdl-location
+  name: hdl-locations-1
 spec:
   owner: group:default/hdl-sw-team
   targets:
@@ -27,6 +27,7 @@ spec:
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/library-xilinx-util_adxcvr-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/library-xilinx-util_clkdiv-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad3552r_evb-zed-catalog-info.yaml
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad40xx_fmc-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad4110-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad411x_ad717x-de10nano-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad4134_fmc-zed-catalog-info.yaml
@@ -45,6 +46,7 @@ spec:
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad738x_fmc-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad7405_fmc-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad7606x_fmc-zed-catalog-info.yaml
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad7616_sdz-zc706-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad7616_sdz-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad77681evb-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-ad7768evb-zed-catalog-info.yaml
@@ -100,9 +102,7 @@ spec:
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9009zu11eg-adrv2crr_fmc-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9009zu11eg-adrv2crr_fmcomms8-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9009zu11eg-adrv2crr_fmcxmwbr1-catalog-info.yaml
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9009zu11eg-adrv2crr_xmicrowave-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9026-a10soc-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9026-zcu102-catalog-info.yaml
-  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv904x-zcu102-catalog-info.yaml
-  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9361z7035-ccbob_cmos-catalog-info.yaml
-  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9361z7035-ccbob_lvds-catalog-info.yaml
   type: url

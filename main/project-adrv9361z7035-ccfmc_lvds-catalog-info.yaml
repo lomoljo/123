@@ -11,7 +11,7 @@ metadata:
   annotations:
     backstage.io/source-location: url:https://github.com/analogdevicesinc/hdl/tree/main/projects/adrv9361z7035/ccfmc_lvds
   tags:
-  - ccfmc_lvds
+  - ccfmc-lvds
   - hdl
   - project
   - reference-design

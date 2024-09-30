@@ -11,7 +11,7 @@ metadata:
   annotations:
     backstage.io/source-location: url:https://github.com/analogdevicesinc/hdl/tree/main/projects/adrv9364z7020/ccpackrf_lvds
   tags:
-  - ccpackrf_lvds
+  - ccpackrf-lvds
   - hdl
   - project
   - reference-design

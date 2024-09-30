@@ -1,10 +1,13 @@
 apiVersion: backstage.io/v1alpha1
 kind: Location
 metadata:
-  name: hdl-location
+  name: hdl-locations-2
 spec:
   owner: group:default/hdl-sw-team
   targets:
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv904x-zcu102-catalog-info.yaml
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9361z7035-ccbob_cmos-catalog-info.yaml
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9361z7035-ccbob_lvds-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9361z7035-ccfmc_lvds-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9361z7035-ccpackrf_lvds-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-adrv9364z7020-ccbob_cmos-catalog-info.yaml
@@ -94,6 +97,7 @@ spec:
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-pluto-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-pulsar_adc-coraz7s-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-pulsar_adc-zed-catalog-info.yaml
+  - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-pulsar_adc_pmdz-coraz7s-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-pulsar_lvds_adc-zed-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-sidekiqz2-catalog-info.yaml
   - https://github.com/analogdevicesinc/hdl/tree/backstage_yaml/yaml/project-usrpe31x-catalog-info.yaml

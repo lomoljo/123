@@ -75,8 +75,8 @@ metadata:
   - ad4030-24
   - ad4630-16
   - ad4630-24
-  - eval-ad4030_fmcz
-  - eval-ad4630_fmcz
+  - eval-ad4030-fmcz
+  - eval-ad4630-fmcz
   - hdl
   - project
   - reference-design

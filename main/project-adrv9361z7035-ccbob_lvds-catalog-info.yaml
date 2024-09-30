@@ -11,7 +11,7 @@ metadata:
   annotations:
     backstage.io/source-location: url:https://github.com/analogdevicesinc/hdl/tree/main/projects/adrv9361z7035/ccbob_lvds
   tags:
-  - ccbob_lvds
+  - ccbob-lvds
   - hdl
   - project
   - reference-design

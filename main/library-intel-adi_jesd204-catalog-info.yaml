@@ -2,8 +2,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: hdl-library-intel-adi_jesd204
-  title: ADI_JESD204_GLUE HDL IP core
-  description: ADI_JESD204_GLUE HDL IP core
+  title: ADI_JESD204 HDL IP core
+  description: ADI_JESD204 HDL IP core
   version: main
   classification: software
   license:

@@ -11,7 +11,7 @@ metadata:
   annotations:
     backstage.io/source-location: url:https://github.com/analogdevicesinc/hdl/tree/main/projects/adrv9009zu11eg/adrv2crr_fmcomms8
   tags:
-  - adrv2crr_fmcomms8
+  - adrv2crr-fmcomms8
   - hdl
   - project
   - reference-design

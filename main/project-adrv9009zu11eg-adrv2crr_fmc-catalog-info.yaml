@@ -11,7 +11,7 @@ metadata:
   annotations:
     backstage.io/source-location: url:https://github.com/analogdevicesinc/hdl/tree/main/projects/adrv9009zu11eg/adrv2crr_fmc
   tags:
-  - adrv2crr_fmc
+  - adrv2crr-fmc
   - hdl
   - project
   - reference-design
