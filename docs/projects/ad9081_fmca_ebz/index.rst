@@ -81,7 +81,7 @@ Supported carriers
      - Carrier
      - FMC slot
    * - :adi:`AD9081-FMCA-EBZ <EVAL-AD9081>`
-     - `A10SoC`_
+     - :intel:`A10SoC <content/www/us/en/products/details/fpga/development-kits/arria/10-sx.html>`
      - FMCA
    * -
      - :xilinx:`VCK190`
@@ -127,8 +127,9 @@ Supported carriers
 
 .. warning::
 
-   For `A10SoC`_ setups, the following reworks are required on the evaluation
-   board:
+   When using :intel:`A10SoC <content/www/us/en/products/details/fpga/development-kits/arria/10-sx.html>`
+   in your setup, the following reworks are required **on the evaluation
+   board**:
 
    -  To avoid using an external clock source and fully rely on the HMC7044
       clock chip, rotate the C6D/C4D caps in C5D/C3D position
@@ -138,7 +139,8 @@ Supported carriers
    -  If LEDS V1P0_LED and VINT_LED are not on, please **depopulate R22M
       and populate R2M**
 
-   For the carrier, `A10SoC`_, the following reworks are mandatory:
+   For the carrier, :intel:`A10SoC <content/www/us/en/products/details/fpga/development-kits/arria/10-sx.html>`,
+   the following reworks are mandatory:
    :dokuwiki:`[Wiki] FMC Pin Connection Configuration <resources/eval/user-guides/ad9081/quickstart/a10soc#fmc_pin_connection_configuration_change>`
 
 Block design
@@ -808,5 +810,3 @@ Software related
 .. include:: ../common/more_information.rst
 
 .. include:: ../common/support.rst
-
-.. _A10SoC: https://www.intel.com/content/www/us/en/products/details/fpga/development-kits/arria/10-sx.html

@@ -28,7 +28,7 @@ source_suffix = '.rst'
 
 # -- External docs configuration ----------------------------------------------
 
-interref_repos = ['doctools']
+interref_repos = ['doctools', 'documentation']
 
 # -- Custom extensions configuration ------------------------------------------
 

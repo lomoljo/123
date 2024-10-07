@@ -6,27 +6,58 @@ Build an HDL project
 .. warning::
 
    Please note that ADI only provides the source files necessary to create
-   and build the designs. This means that you are responsible for modifying
-   and building these projects.
+   and build the reference designs &
+   :dokuwiki:`already-built files <resources/tools-software/linux-software/adi-kuiper_images/release_notes>`
+   for booting up the setup with the reference design.
 
-Here, we are giving you a quick rundown on how we build things. That said,
+   You are responsible for modifying and building the modified projects.
+
+   In case you **don't want to manually build** the reference design projects,
+   you can get the already built & tested files from our ADI Kuiper Linux
+   release (contains HDL + Linux boot files) from
+   :dokuwiki:`here <resources/tools-software/linux-software/adi-kuiper_images/release_notes>`.
+
+Here we are giving you a quick rundown on how we build things. That said,
 the steps below are **not a recommendation**, but a suggestion.
-How you want to build these projects is entirely up to you.
-The only catch is that if you run into problems, you have to resolve them
-independently.
+**How you want to build these projects is entirely up to you.**
+The only catch is that if you run into problems, **you have to resolve them
+independently.**
 
 The build process depends on certain software and tools, which you could use
 in many ways. We use **command line** and mostly **Linux systems**.
-On Windows, we use **Cygwin**.
 
-Needed tools
+.. caution::
+
+   Thus, the user **MUST** be familiar with **BASIC** Linux terminal commands
+   such as:
+   **cd, make, mkdir, ls, touch, source, export**
+
+   and simple GitHub command line commands (or the equivalent in GUI):
+   **clone, status, checkout, log, fetch, rebase**.
+
+Overview
+-------------------------------------------------------------------------------
+
+This is a detailed guide with lots of information regarding everything.
+Careful reading is needed. To put it in few words, the following steps will
+be described:
+
+#. :ref:`install the needed tools <build_hdl needed-tools>`
+#. :ref:`clone the hdl repository <build_hdl setup-repo>`
+#. :ref:`source the paths to the tools <build_hdl environment>`
+#. :ref:`build the project <build_hdl build>`
+#. :ref:`build the hdl boot file <build_hdl boot-file>`
+
+.. _build_hdl needed-tools:
+
+1. Needed tools
 -------------------------------------------------------------------------------
 
 #. Install the required FPGA design suite. We use `AMD Xilinx Vivado`_,
    `Intel Quartus Prime Pro and Standard`_, `Lattice Radiant`_ and
    `Lattice Propel`_.
-   You can find information about the proper version in our
-   `release notes <https://github.com/analogdevicesinc/hdl/releases>`__.
+   You can find information about the proper version in the section
+   :ref:`build_hdl tool-versions`.
    Make sure that you're always using the latest release.
 #. The **required** Vivado/Quartus/Propel/Radiant version can be found in:
 
@@ -49,8 +80,11 @@ Needed tools
    `GNU Make <https://www.gnu.org/software/make/>`__ to build the
    projects. Depending on what OS you're using, you have these options:
 
-Setup the HDL repository
+.. _build_hdl setup-repo:
+
+2. Setup the HDL repository
 -------------------------------------------------------------------------------
+
 These designs are built upon ADI's generic HDL reference designs framework.
 ADI distributes the bit/elf files of these projects as part of the
 :dokuwiki:`ADI Kuiper Linux <resources/tools-software/linux-software/kuiper-linux>`.
@@ -64,8 +98,6 @@ Please refer to the :ref:`git_repository` section for more details.
 
 .. code-block:: bash
 
-   [~] mkdir adi
-   [~] cd adi
    [~] git clone git@github.com:analogdevicesinc/hdl.git
 
 .. collapsible:: Cloning is done now using SSH
@@ -83,26 +115,137 @@ Please refer to the :ref:`git_repository` section for more details.
       For example: (:code:`\\\\wsl.localhost\\Ubuntu\\home\\username\\hdl`)
 
 The above command clones the **default** branch, which is the **main** for
-HDL. The **main** branch always points to the latest stable release
+HDL repo. The **main** branch always points to the latest stable release
 branch, but it also has features **that are not fully tested**. If you
 want to switch to any other branch you need to checkout that branch:
 
 .. code-block:: bash
 
-   [~] cd hdl/
-   [~] git status
-   [~] git checkout hdl_2022_r2
+   [~] cd hdl
+   [~/hdl] git checkout hdl_2022_r2
 
-If this is your first time cloning, you have all the latest source files.
+If this is your first time cloning, you have the latest source files.
 If not, you can simply pull the latest sources using ``git pull`` or
 ``git rebase`` if you have local changes.
 
 .. code-block:: bash
 
-   [~] git fetch origin               # this shows you what changes will be pulled on your local copy
-   [~] git rebase origin/hdl_2022_r2  # this updates your local copy
+   [~/hdl] git fetch origin               # this shows you what changes will be pulled on your local copy
+   [~/hdl] git rebase origin/hdl_2022_r2  # this updates your local copy
 
-Building the projects
+.. _build_hdl environment:
+
+3. Environment
+-------------------------------------------------------------------------------
+
+Our recommended build flow is to use ``make`` and the command line version of
+the tools. This method facilitates our overall build and release process as it
+automatically builds the required libraries and dependencies.
+
+The Intel and AMD tools come with certain **settings*.sh** scripts that:
+
+* you may source them in your **\~/.bashrc** file to set up the environment,
+  then
+  `reload it <https://stackoverflow.com/questions/2518127/how-to-reload-bashrc-settings-without-logging-out-and-back-in-again>`__
+* or, if you don't want to use the .bashrc file, you can run these commands
+  every time before building a project
+
+Check out the following sections for the paths you need to export.
+
+3a. Linux environment setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All major distributions should have ``make`` installed by default. If not,
+when trying the command, it should tell you how to install it with the
+package name.
+
+.. caution::
+
+   Change the path and the tool version accordingly to your installation!
+
+.. code-block:: bash
+   :linenos:
+
+   // for AMD Xilinx
+   source /opt/Xilinx/Vivado/202x.x/settings64.sh
+
+   export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
+   export PATH=$PATH:/opt/Xilinx/Vitis/202x.x/gnu/microblaze/nt/bin
+
+   // for Intel
+   export PATH=$PATH:/opt/intelFPGA_pro/2x.x/quartus/bin
+
+   // for Lattice
+   export PATH=$PATH:/opt/lscc/propel/202x.x/builder/rtf/bin/lin64
+   export PATH=$PATH:/opt/lscc/radiant/202x.x/bin/lin64
+
+3b. Windows environment setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because GNU Make is not supported on Windows, you need to install
+`Cygwin <https://www.cygwin.com/>`__, which is a UNIX-like environment
+and command-line interface for Microsoft Windows.
+
+.. caution::
+
+   Change the path and the tool version accordingly to your installation!
+
+For example:
+
+.. code-block:: bash
+   :linenos:
+
+   // for AMD Xilinx
+   source /cygdrive/path_to/Xilinx/Vivado/202x.x/settings64.sh
+
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vivado/202x.x/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vivado_HLS/202x.x/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vitis/202x.x/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vitis/202x.x/gnu/microblaze/nt/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vitis/202x.x/gnu/arm/nt/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vitis/202x.x/gnu/microblaze/linux_toolchain/nt64_be/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vitis/202x.x/gnu/microblaze/linux_toolchain/nt64_le/bin
+   export PATH=$PATH:/cygdrive/c/Xilinx/Vitis/202x.x/gnu/aarch32/nt/gcc-arm-none-eabi/bin
+
+   // for Intel
+   export PATH=$PATH:/cygdrive/c/intelFPGA_pro/2x.x/quartus/bin64
+
+   // for Lattice
+   export PATH=$PATH:/cygdrive/c/lscc/propel/202x.x/builder/rtf/bin/nt64
+   export PATH=$PATH:/cygdrive/c/lscc/radiant/202x.x/bin/nt64
+
+.. collapsible:: Alternatives to Cygwin/Linux terminal
+
+   A very good alternative to Cygwin -- **but not supported by us** -- is
+   `WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__.
+
+   If you do not want to use neither Cygwin nor WSL, there might still be some
+   alternative. There are ``make`` alternatives for **Windows Command
+   Prompt**, minimalist GNU for Windows (**MinGW**), or the **Cygwin
+   variations** installed by the tools itself.
+   **But note that we do not support it!**
+
+   Some of these may not be fully functional with our scripts and/or projects.
+   If you are an Intel user, the **Nios II Command Shell** does support make.
+   If you are an AMD user, use the **gnuwin** installed as part of the SDK,
+   usually at ``C:\Xilinx\Vitis\202x.x\gnuwin\bin``.
+
+**How to verify your environment setup**
+
+Run any of the following commands. These commands will return a valid path
+if your setup is good.
+
+.. code-block:: bash
+   :linenos:
+
+   [~] which git
+   [~] which make
+   [~] which vivado
+   [~] which quartus
+
+.. _build_hdl build:
+
+4. Building the projects
 -------------------------------------------------------------------------------
 
 .. caution::
@@ -115,13 +258,14 @@ Building the projects
       then you have the alternative of setting ``export ADI_IGNORE_VERSION_CHECK=1``
       before building the project. Otherwise your project will fail.
 
-   #. have the environment prepared and the proper tools. See `Tools`_ section
-      on what you need to download and `Environment`_ section on how to
-      set-up your environment.
+   #. have the environment prepared and the proper tools. See
+      `Tools`_ section on what you need to download and
+      :ref:`build_hdl environment` section on how to set-up your environment.
 
-If you're not using the Vivado version we recommend, just know that we do not
-guarantee that the project will build ok. The projects are built and tested
-in hardware using the Vivado version specific for that branch.
+If you're not using the Vivado version we recommend, just know that **we do not
+guarantee** that the project will build ok. The projects are built and tested
+in hardware using the Vivado version
+:ref:`**specific for that branch <build_hdl needed-tools>`.
 
 Simply put, to build a project you just run ``make`` in your Linux terminal
 or in Cygwin. For more details, please read the rest of the documentation.
@@ -131,153 +275,26 @@ run ``make clean``.
 To clean both the already built IP cores which the project depends on and the project,
 run ``make clean-all``.
 
-Building an Intel project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-An Intel project build is relatively easy. There is no need to build any
-library components. Go to the directory of the project of interest,
-then inside the desired carrier run ``make`` to build
-the project. In this example, I am only interested in the
-**ADRV9371X** project on the **A10SOC** carrier.
-
-.. code-block:: bash
-
-   [~] cd projects/adrv9371x/a10soc
-   [~] make
-
-This assumes that you have the tools and licenses set up correctly. If
-you don't get to the last line, the make failed to build the project.
-There is nothing you can gather from the ``make`` output (other than the
-build failed or not), the actual failure is in a log file. So, let's see
-how to analyze the build log files and results.
-
-.. note::
-
-   If you want to use a NIOS-II based project with no-OS
-   software, you have to turn off the MMU feature of the NIOS_II processor.
-   In that case, the make will get an additional attribute:
-   ``make NIOS2_MMU=0``
-
-Checking the build and analyzing results
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If you look closely at the **rule** for this target, you see it is just
-calling ``quartus_sh`` with the project TCL file and redirecting the
-output to a log file. In this case it is called **adrv9371_a10soc_quartus.log**
-and is inside the **projects/adrv9371x/a10soc** directory.
-
-Do a quick (or detailed) check on files. If you are seeking support from us,
-this contains the most relevant information that you need to provide.
-
-.. warning::
-
-   Do NOT copy-paste ``make`` command line text
-
-.. code-block:: bash
-
-   [~] ls -ltr projects/adrv9371x/a10soc
-   [~] tail projects/adrv9371x/a10soc/adrv9371x_a10soc_quartus.log
-
-And finally, if the project was built is successfully, the **.sopcinfo** and
-**.sof** files should be in the same folder.
-
-.. code-block:: bash
-
-   [~] ls -ltr projects/adrv9371x/a10soc/*.sopcinfo
-   [~] ls -ltr projects/adrv9371x/a10soc/*.sof
-
-You may now use this **sopcinfo** file as the input to your :git-no-os:`no-OS <>`
-and/or :git-linux:`Linux <>` build.
-The **sof** file is used to program the device.
-
-.. collapsible:: Building an Intel project in WSL - known issues
-
-   For a10Soc and s10Soc projects it's very possible to face the following
-   error when you try to build the project:
-
-   .. warning::
-
-      Current module quartus_fit was
-      unexpectedly terminated by signal 9. This may be because some system
-      resource has been exhausted, or quartus_fit performed an illegal
-      operation.
-
-   It can also happen that ``make`` gets stuck when
-   synthesizing some IPs. These errors may appear because your device does
-   not have enough RAM memory to build your FPGA design. This problem can
-   be solved if you create a Linux Swap file.
-
-   You can find more information about what a swap file is at this link:
-   `SwapFile <https://linuxize.com/post/create-a-linux-swap-file/>`__.
-
-   Depending on the size of the project, more or less virtual memory must
-   be allocated. If you type in the search bar **System Information**, you
-   can see Total Physical Memory and Total Virtual Memory of your system.
-   For example, for the AD9213 with S10SoC project, it was necessary to
-   allocate 15 GB of virtual memory, to be able to make a build for the
-   project. To create a swap file you can use the following commands:
-
-   .. code-block:: bash
-
-      [~] sudo fallocate -l "memory size (e.g 1G, 2G, 8G, etc.)" /swapfile
-      [~] sudo chmod 600 /swapfile
-      [~] sudo mkswap /swapfile
-      [~] sudo swapon /swapfile
-
-   If you want to make the change permanent:
-
-   .. code-block:: bash
-
-      # in /etc/fstab file type the command:
-      /swapfile swap swap defaults 0 0
-
-   If you want to deactivate the swap memory:
-
-   .. code-block:: bash
-
-      [~] sudo swapoff -v /swapfile
-
-.. collapsible:: Building manually in Quartus GUI
-
-   .. warning::
-
-      We do not recommend using this flow, in general people are losing a lot
-      of valuable time and nerve during this process.
-
-   There is no need to build any library for Quartus. However, you do need
-   to specify the IP search path for QSYS. This is a global property, so
-   only need to do it once. If you have multiple paths simply add to it.
-   You get to this menu from the **Tools->Options**. The tool then parses
-   these directories and picks up a **\_hw.tcl** file (e.g.
-   **axi_ad9250_hw.tcl**). The peripherals should show up on QSYS library.
-
-   You may now run the project (generate the sof and software hand-off
-   files) on Quartus. Open the GUI and select TCL console. At the prompt
-   change the directory to where the project is, and source the
-   **system_project.tcl** file.
-
-   .. code-block:: bash
-
-      [~] cd c:/github/hdl/projects/daq2/a10soc
-      [~] source ./system_project.tcl
-
-   You will see commands being executed, the script uses a board design in
-   QSYS, generate all the IP targets, synthesize the netlist and
-   implementation.
-
-Building an AMD project
+4a. Building an AMD project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An AMD project is built the same way as an Intel project. The only
 exception is that there are a few 'sub-make(s)' for the library
 components. The way of building a project in Cygwin and WSL is almost the same.
-In this example, it is building the **DAQ2**
-project on the **ZC706** carrier.
+
+You just need to go to the hdl/projects folder, choose the ADI part that you
+want to use, then enter the folder of the FPGA carrier that you want, and run
+``make`` to build the project.
+
+A generic path where you want to build the project would look like:
+``hdl/projects/$ADI_part/$FPGA_carrier``.
+
+**EXAMPLE**: Here we are building the **DAQ2** project on the **ZC706** carrier.
 
 .. code-block:: bash
 
-   [~] cd projects/daq2/zc706
-   [~] make
+   [~/hdl] cd projects/daq2/zc706
+   [~/hdl/projects/daq2/zc706] make
 
 The ``make`` builds all the libraries first and then builds the project.
 This assumes that you have the tools and licenses setup correctly. If
@@ -306,7 +323,6 @@ characters.
 
    make RX_LANE_RATE=2.5 TX_LANE_RATE=2.5 RX_JESD_L=8 RX_JESD_M=4 RX_JESD_S=1 RX_JESD_NP=16 TX_JESD_L=8 TX_JESD_M=4 TX_JESD_S=1 TX_JESD_NP=16
 
-
 **Example 2**
 
 Running the command below will create a folder named **LVDSCMOSN1**.
@@ -326,10 +342,10 @@ parallel job number is set to 4.
 
 .. code-block:: bash
 
-   [~] export ADI_USE_OOC_SYNTHESIS=y
-   [~] export ADI_MAX_OOC_JOBS=8
-   [~] cd projects/daq2/zc706
-   [~] make
+   [~/hdl] export ADI_USE_OOC_SYNTHESIS=y
+   [~/hdl] export ADI_MAX_OOC_JOBS=8
+   [~/hdl] cd projects/daq2/zc706
+   [~/hdl/projects/daq2/zc706] make
 
 This will synthesize each IP from the block design individually and will
 store it in a common cache for future re-use. The cache is located in
@@ -350,7 +366,7 @@ project in OOC mode since the cache is not cleared as with normal compile flow.
 
    .. code-block:: bash
 
-      export ADI_USE_OOC_SYNTHESIS=n
+      [~/hdl] export ADI_USE_OOC_SYNTHESIS=n
 
    only in case you want to use Project Mode.
 
@@ -365,7 +381,8 @@ file. In the below example that is **axi_ad7768_ip.log** inside the
 
 .. code-block:: bash
 
-   make[1]: Entering directory '/home/RKutty/gitadi/hdl/library/axi_ad7768'
+   [~/hdl] make -C library/axi_ad7768
+   make[1]: Entering directory '/home/adi/hdl/library/axi_ad7768'
    [~] rm -rf *.cache *.data *.xpr *.log component.xml *.jou xgui *.ip_user_files *.srcs *.hw *.sim .Xil
    [~] vivado -mode batch -source axi_ad7768_ip.tcl  >> axi_ad7768_ip.log 2>&1
 
@@ -374,8 +391,8 @@ the contents of the log file**. You may also check the generated files for more 
 
 .. code-block:: bash
 
-   [~] ls -ltr library/axi_ad7768
-   [~] tail library/axi_ad7768/axi_ad7768_ip.log
+   [~/hdl] ls -ltr library/axi_ad7768
+   [~/hdl] tail library/axi_ad7768/axi_ad7768_ip.log
 
 Checking the build and analyzing results of projects
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -393,14 +410,14 @@ this example, is called **daq2_zc706_vivado.log** and is inside the
 
 Do a quick (or detailed) check on files.
 
-.. warning::
-
-   Do NOT copy-paste ``make`` command line text
-
 .. code-block:: bash
 
    [~] ls -ltr projects/daq2/zc706
    [~] tail projects/daq2/zc706/daq2_zc706_vivado.log
+
+.. caution::
+
+   Do NOT copy-paste ``make`` command line text when asking us questions.
 
 And finally, if the project build is successful, the **system_top.xsa** file
 should be in the **.sdk** folder.
@@ -496,7 +513,151 @@ Starting with Vivado 2019.3, the output file extension was changed from
    script will create a board design in IPI (IP Integrator), generate all the
    IP targets, synthesize the netlist and implementation.
 
-Building a Lattice project
+4b. Building an Intel project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An Intel project build is relatively easy. There is no need to build any
+library components.
+
+You just need to go to the hdl/projects folder, choose the ADI part that you
+want to use, then enter the folder of the FPGA carrier that you want, and run
+``make`` to build the project.
+
+A generic path where you want to build the project would look like:
+``hdl/projects/$ADI_part/$FPGA_carrier``.
+
+**EXAMPLE**: Here we are building the **ADRV9371X** project on the
+**Arria 10 SoC** carrier.
+
+.. code-block:: bash
+
+   [~] cd projects/adrv9371x/a10soc
+   [~] make
+
+This assumes that you have the tools and licenses set up correctly. If
+you don't get to the last line, the make failed to build the project.
+There is nothing you can gather from the ``make`` output (other than the
+build failed or not), the actual failure is in a log file. So, let's see
+how to analyze the build log files and results.
+
+.. note::
+
+   If you want to use a NIOS-II based project with no-OS
+   software, you have to turn off the MMU feature of the NIOS_II processor.
+   In that case, the make will get an additional attribute:
+   ``make NIOS2_MMU=0``
+
+Checking the build and analyzing results
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you look closely at the **rule** for this target, you see it is just
+calling ``quartus_sh`` with the project TCL file and redirecting the
+output to a log file.
+
+**EXAMPLE**: In this case it is called **adrv9371_a10soc_quartus.log**
+and is inside the **projects/adrv9371x/a10soc** directory.
+
+Do a quick (or detailed) check on files. If you are seeking support from us,
+this contains the most relevant information that you need to provide.
+
+.. warning::
+
+   Do NOT copy-paste ``make`` command line text
+
+.. code-block:: bash
+
+   [~] ls -ltr projects/adrv9371x/a10soc
+   [~] tail projects/adrv9371x/a10soc/adrv9371x_a10soc_quartus.log
+
+And finally, if the project was built is successfully, the **.sopcinfo** and
+**.sof** files should be in the same folder.
+
+.. code-block:: bash
+
+   [~] ls -ltr projects/adrv9371x/a10soc/*.sopcinfo
+   [~] ls -ltr projects/adrv9371x/a10soc/*.sof
+
+You may now use this **sopcinfo** file as the input to your :git-no-os:`no-OS <>`
+and/or :git-linux:`Linux <>` build.
+
+The **sof** file is used to program the device.
+
+.. collapsible:: Building an Intel project in WSL - known issues
+
+   For a10Soc and s10Soc projects it's very possible to face the following
+   error when you try to build the project:
+
+   .. warning::
+
+      Current module quartus_fit was
+      unexpectedly terminated by signal 9. This may be because some system
+      resource has been exhausted, or quartus_fit performed an illegal
+      operation.
+
+   It can also happen that ``make`` gets stuck when
+   synthesizing some IPs. These errors may appear because your device does
+   not have enough RAM memory to build your FPGA design. This problem can
+   be solved if you create a Linux Swap file.
+
+   You can find more information about what a swap file is at this link:
+   `SwapFile <https://linuxize.com/post/create-a-linux-swap-file/>`__.
+
+   Depending on the size of the project, more or less virtual memory must
+   be allocated. If you type in the search bar **System Information**, you
+   can see Total Physical Memory and Total Virtual Memory of your system.
+   For example, for the AD9213 with S10SoC project, it was necessary to
+   allocate 15 GB of virtual memory, to be able to make a build for the
+   project. To create a swap file you can use the following commands:
+
+   .. code-block:: bash
+
+      [~] sudo fallocate -l "memory size (e.g 1G, 2G, 8G, etc.)" /swapfile
+      [~] sudo chmod 600 /swapfile
+      [~] sudo mkswap /swapfile
+      [~] sudo swapon /swapfile
+
+   If you want to make the change permanent:
+
+   .. code-block:: bash
+
+      # in /etc/fstab file type the command:
+      /swapfile swap swap defaults 0 0
+
+   If you want to deactivate the swap memory:
+
+   .. code-block:: bash
+
+      [~] sudo swapoff -v /swapfile
+
+.. collapsible:: Building manually in Quartus GUI
+
+   .. warning::
+
+      We do not recommend using this flow, in general people are losing a lot
+      of valuable time and nerve during this process.
+
+   There is no need to build any library for Quartus. However, you do need
+   to specify the IP search path for QSYS. This is a global property, so
+   only need to do it once. If you have multiple paths simply add to it.
+   You get to this menu from the **Tools->Options**. The tool then parses
+   these directories and picks up a **\_hw.tcl** file (e.g.
+   **axi_ad9250_hw.tcl**). The peripherals should show up on QSYS library.
+
+   You may now run the project (generate the sof and software hand-off
+   files) on Quartus. Open the GUI and select TCL console. At the prompt
+   change the directory to where the project is, and source the
+   **system_project.tcl** file.
+
+   .. code-block:: bash
+
+      [~] cd c:/github/hdl/projects/daq2/a10soc
+      [~] source ./system_project.tcl
+
+   You will see commands being executed, the script uses a board design in
+   QSYS, generate all the IP targets, synthesize the netlist and
+   implementation.
+
+4c. Building a Lattice project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. warning::
@@ -672,6 +833,57 @@ option to run the targets in parallel, e.g. ``make -j4``.
 All artifacts generated by the build process should be "git"-ignored,
 e.g. ``component.xml`` and ``.lock`` files.
 
+.. _build_hdl boot-file:
+
+5. Preparing the SD card
+-------------------------------------------------------------------------------
+
+First, you have to write the SD card with the
+:external+documentation:doc:`ADI Kuiper image <linux/kuiper/index>`.
+Check this
+:external+documentation:ref:`tutorial <kuiper sdcard>`.
+
+Once you are done with that, you can go on with the following steps.
+
+For AMD FPGAs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On the BOOT partition recently created, you will find folders for each
+carrier that we support, and each of these folders contain an archive
+called **bootgen_sysfiles.tgz**. These have all the files needed to
+generate the **BOOT.BIN**.
+
+Copy the corresponding archive (checking for the name of your carrier
+and components) into the root folder of your project, unzip it twice,
+and there you will find the files that are needed to generate the
+**BOOT.BIN**. Copy them to be in the root directory.
+
+#. fsbl.elf
+#. zynq.bif
+#. u-boot.elf
+#. and if you're using ZCU102, then bl31.elf and pmu.elf
+
+Next, what your project needs, is the:
+
+- *uImage* (for Zynq-based carriers), found in *zynq-common* folder
+- or *Image* (for Zynq UltraScale - ZCU102 and ADRV9009-ZU11EG carriers)
+  found in *zynqmp-common*
+- or *Image* (for Versal carriers), found in *versal-common* folder
+
+on your BOOT partition. Copy this file also in the root directory of your project.
+
+More info on how to generate this file you will find in the
+`References`_ section or in the **README.txt** file from BOOT partition.
+
+.. note::
+
+   For building the BOOT.BIN, check out this page: :ref:`build_boot_bin`
+
+5b. For Intel FPGAs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check out :dokuwiki:`this guide <resources/tools-software/linux-software/altera_soc_images>`.
+
 Tools and their versions
 -------------------------------------------------------------------------------
 
@@ -686,93 +898,97 @@ on these tools.
 
 **A red text indicates that you must pay extra attention.**
 
-.. list-table:: Tools from Intel and AMD
-   :widths: auto
-   :header-rows: 1
+.. collapsible:: Click here to see the tools from Intel, AMD and Lattice
 
-   * - Notes
-     - Intel
-     - AMD
-   * - Main tools
-     - Quartus
-     - Vivado
-   * - EDK tools
-     - QSys
-     - IP Integrator
-   * - SDK tools
-     - Eclipse-Nios, Eclipse-DS5
-     - Eclipse
-   * - Building library
-     - :green:`Do nothing. Quartus only needs the _hw.tcl and QSys parses them
-       whenever invoked`
-     - :red:`Need to build each and every library component. Vivado has its
-       own way of identifying library components. This means you must build
-       ALL the library components first before starting the project. You must
-       re-run these scripts if there are any modifications`
-   * - Building the project
-     - Source the system_project.tcl file
-     - Source the system_project.tcl file
-   * - Timing analysis
-     - The projects are usually tested and should be free of timing errors.
-       There is no straightforward method to verify a timing pass (it usually
-       involves writing a TCL proc by itself) on both the tools. The make
-       build will fail and return with an error if the timing is not met.
-     - The projects are usually tested and should be free of timing errors.
-       There is no straightforward method to verify a timing pass (it usually
-       involves writing a TCL proc by itself) on both the tools. The make
-       build will fail and return with an error if the timing is not met.
-   * - SDK (Microblaze/Nios)
-     - Use SOPCINFO and SOF files
-     - Use XSA file
-   * - SDK (ARM/FPGA combo)
-     - :red:`Not so well-thought procedure. Need to run different tools,
-       manually edit build files etc. The steps involved are running
-       bsp-editor, running make, modifying linker scripts, makefiles and
-       sources, importing to SDK`
-     - :green:`Same procedure as Microblaze`
-   * - Upgrading/Version changes (non-ADI cores)
-     - :green:`Quartus automatically updates the cores. Almost hassle-free for
-       most of the cores`
-     - :red:`Vivado does not automatically update the revisions in TCL flow
-       (it does on GUI). It will stop at the first version mismatch (a rather
-       slow and frustrating process)`
+   .. list-table:: Tools from Intel and AMD
+      :widths: auto
+      :header-rows: 1
 
-.. list-table:: Tools from Lattice
-   :widths: auto
-   :header-rows: 1
+      * - Notes
+        - Intel
+        - AMD
+      * - Main tools
+        - Quartus
+        - Vivado
+      * - EDK tools
+        - QSys
+        - IP Integrator
+      * - SDK tools
+        - Eclipse-Nios, Eclipse-DS5
+        - Eclipse
+      * - Building library
+        - :green:`Do nothing. Quartus only needs the _hw.tcl and QSys parses them
+          whenever invoked`
+        - :red:`Need to build each and every library component. Vivado has its
+          own way of identifying library components. This means you must build
+          ALL the library components first before starting the project. You must
+          re-run these scripts if there are any modifications`
+      * - Building the project
+        - Source the system_project.tcl file
+        - Source the system_project.tcl file
+      * - Timing analysis
+        - The projects are usually tested and should be free of timing errors.
+          There is no straightforward method to verify a timing pass (it usually
+          involves writing a TCL proc by itself) on both the tools. The make
+          build will fail and return with an error if the timing is not met.
+        - The projects are usually tested and should be free of timing errors.
+          There is no straightforward method to verify a timing pass (it usually
+          involves writing a TCL proc by itself) on both the tools. The make
+          build will fail and return with an error if the timing is not met.
+      * - SDK (Microblaze/Nios)
+        - Use SOPCINFO and SOF files
+        - Use XSA file
+      * - SDK (ARM/FPGA combo)
+        - :red:`Not so well-thought procedure. Need to run different tools,
+          manually edit build files etc. The steps involved are running
+          bsp-editor, running make, modifying linker scripts, makefiles and
+          sources, importing to SDK`
+        - :green:`Same procedure as Microblaze`
+      * - Upgrading/Version changes (non-ADI cores)
+        - :green:`Quartus automatically updates the cores. Almost hassle-free for
+          most of the cores`
+        - :red:`Vivado does not automatically update the revisions in TCL flow
+          (it does on GUI). It will stop at the first version mismatch (a rather
+          slow and frustrating process)`
 
-   * - Notes
-     - Lattice
-   * - Main tools
-     - Radiant
-   * - EDK tools
-     - Propel Builder
-   * - SDK tools
-     - Propel (Eclipse)
-   * - Building library
-     - :red:`Not supported yet.`
-   * - Building the project
-     - Source the system_project_pb.tcl file in Propel Builder tclsh, source the
-       system_project.tcl file in Radiant tclsh after.
-   * - Timing analysis
-     - The projects are usually tested and should be free of timing errors.
-       There is no straightforward method to verify a timing pass (it usually
-       involves writing a TCL proc by itself) on both the tools. The make
-       build will fail and return with an error if the timing is not met.
-   * - SDK (Lattice riscv-rx)
-     - Use the generated sge folder that contains the bsp and the SoC
-       configuration files. You can create a Propel SDK project using the
-       sys_env.xml file (currently only no-OS and rtos, but not linked yet to
-       ADI no-OS infrastructure)
-   * - SDK (ARM/FPGA combo)
-     - :red:`Not supported or nonexistent yet.`
-   * - Upgrading/Version changes (non-ADI cores)
-     - :red:`You have to update the IP versions manually in GUI and copy the config
-       from the tcl console to the '.tcl' block design file, or update directly
-       in the '.tcl' block design file. Note that first you have to download the
-       new version of IPs using the GUI. An ip_upgrade tcl command exists, but
-       still the IPs have to be downloaded manually, and it only works if the old
-       IP's name is the same as the new (sometimes it changes by version).`
+   .. list-table:: Tools from Lattice
+      :widths: auto
+      :header-rows: 1
+
+      * - Notes
+        - Lattice
+      * - Main tools
+        - Radiant
+      * - EDK tools
+        - Propel Builder
+      * - SDK tools
+        - Propel (Eclipse)
+      * - Building library
+        - :red:`Not supported yet.`
+      * - Building the project
+        - Source the system_project_pb.tcl file in Propel Builder tclsh, source the
+          system_project.tcl file in Radiant tclsh after.
+      * - Timing analysis
+        - The projects are usually tested and should be free of timing errors.
+          There is no straightforward method to verify a timing pass (it usually
+          involves writing a TCL proc by itself) on both the tools. The make
+          build will fail and return with an error if the timing is not met.
+      * - SDK (Lattice riscv-rx)
+        - Use the generated sge folder that contains the bsp and the SoC
+          configuration files. You can create a Propel SDK project using the
+          sys_env.xml file (currently only no-OS and rtos, but not linked yet to
+          ADI no-OS infrastructure)
+      * - SDK (ARM/FPGA combo)
+        - :red:`Not supported or nonexistent yet.`
+      * - Upgrading/Version changes (non-ADI cores)
+        - :red:`You have to update the IP versions manually in GUI and copy the config
+          from the tcl console to the '.tcl' block design file, or update directly
+          in the '.tcl' block design file. Note that first you have to download the
+          new version of IPs using the GUI. An ip_upgrade tcl command exists, but
+          still the IPs have to be downloaded manually, and it only works if the old
+          IP's name is the same as the new (sometimes it changes by version).`
+
+.. _build_hdl tool-versions:
 
 Tool versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -800,165 +1016,13 @@ to use an unsupported version of tools.
    :git-hdl:`or for Quartus version <scripts/adi_env.tcl#L34>`),
    which builds the projects.
 
-Environment
--------------------------------------------------------------------------------
-
-As said above, our recommended build flow is to use ``make`` and the
-command line version of the tools. This method facilitates our
-overall build and release process as it automatically builds the
-required libraries and dependencies.
-
-Linux environment setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-All major distributions should have ``make`` installed by default. If not,
-if you try the command, it should tell you how to install it with the
-package name.
-
-You may have to install ``git`` (``sudo apt-get install git``)
-and the Intel and AMD tools. These tools come with certain
-**settings*.sh** scripts that you may source in your **.bashrc** file to
-set up the environment. You may also do this manually (for better or
-worse); the following snippet is from a **.bashrc** file. Please note
-that unless you are an expert at manipulating these things, it is best to leave it to
-the tools to set up the environment.
-
-.. code-block:: bash
-
-   export PATH=$PATH:/opt/Xilinx/Vivado/202x.x/bin:/opt/Xilinx/Vitis/202x.x/bin
-   export PATH=$PATH:/opt/intelFPGA_pro/2x.x/quartus/bin
-   export PATH=$PATH:/opt/lscc/propel/202x.x/builder/rtf/bin/lin64
-   export PATH=$PATH:/opt/lscc/radiant/202x.x/bin/lin64
-
-Windows environment setup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Because GNU Make is not supported on Windows, you need to install
-`Cygwin <https://www.cygwin.com/>`__, which is a UNIX-like environment
-and command-line interface for Microsoft Windows. You do not need to
-install any special package, other than ``git`` and ``make``. You should
-do changes to your **.bashrc** in a similar manner to the Linux environment.
-
-After you have installed Cygwin, you need to add your FPGA Design Tools
-installation directory to your PATH environment variable. You can do
-that by modifying your **.bashrc** file, by adding the following lines
-(**changed accordingly to your installation directories**).
-
-For example:
-
-.. code-block:: bash
-   :linenos:
-
-   // AMD Xilinx
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vivado/202x.x/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vivado_HLS/202x.x/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vitis/202x.x/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vitis/202x.x/gnu/microblaze/nt/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vitis/202x.x/gnu/arm/nt/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vitis/202x.x/gnu/microblaze/linux_toolchain/nt64_be/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vitis/202x.x/gnu/microblaze/linux_toolchain/nt64_le/bin
-   export PATH=$PATH:/cygdrive/path_to/Xilinx/Vitis/202x.x/gnu/aarch32/nt/gcc-arm-none-eabi/bin
-
-   // Intel
-   export PATH=$PATH:/cygdrive/path_to/intelFPGA_pro/2x.x/quartus/bin64
-
-   // Lattice
-   export PATH=$PATH:/cygdrive/path_to/lscc/propel/202x.x/builder/rtf/bin/nt64
-   export PATH=$PATH:/cygdrive/path_to/lscc/radiant/202x.x/bin/nt64
-
-   Replace the **path_to** string with your path to the installation folder
-   and the **tools version** with the proper one.
-
-A very good alternative to Cygwin -- but not supported by us -- is
-`WSL <https://learn.microsoft.com/en-us/windows/wsl/install/>`__.
-
-If you do not want to use neither Cygwin nor WSL, there might still be some
-alternative. There are ``make`` alternatives for **Windows Command
-Prompt**, minimalist GNU for Windows (**MinGW**), or the **Cygwin
-variations** installed by the tools itself. But note that we do not support it.
-
-Some of these may not be fully functional with our scripts and/or projects.
-If you are an Intel user, the **Nios II Command Shell** does support make.
-If you are an AMD user, use the **gnuwin** installed as part of the SDK,
-usually at ``C:\Xilinx\Vitis\202x.x\gnuwin\bin``.
-
-.. collapsible::  How to verify your environment setup
-
-   Run any of the following commands. These commands will return a valid path
-   if your setup is good.
-
-   .. code-block:: bash
-
-      [~] which git
-      [~] which make
-      [~] which vivado
-      [~] which quartus
-
-Preparing the SD card
--------------------------------------------------------------------------------
-
-Firstly, you have to check this
-:dokuwiki:`tutorial <resources/tools-software/linux-software/zynq_images/windows_hosts>`
-on how to put the Linux image on your SD card. Once you are done with
-that, you can go on with the following steps.
-
-For AMD FPGAs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-On the BOOT partition recently created, you will find folders for each
-carrier that we support, and each of these folders contain an archive
-called **bootgen_sysfiles.tgz**. These have all the files needed to
-generate the **BOOT.BIN**.
-
-Copy the corresponding archive (checking for the name of your carrier
-and components) into the root folder of your project, unzip it twice,
-and there you will find the files that are needed to generate the
-**BOOT.BIN**. Copy them to be in the root directory.
-
-#. fsbl.elf
-#. zynq.bif
-#. u-boot.elf
-#. and if you're using ZCU102, then bl31.elf and pmu.elf
-
-Next, what your project needs, is the **uImage** (for Zynq based
-carriers) or **Image** (for Zynq UltraScale - ZCU102 and ADRV9009-ZU11EG
-carriers) or **zImage** (for Intel based carriers) file that you will find
-in the **zynq-common** or **zynqmp-common**, **socfpga_arria10_common** or
-**socfpga_cyclone5_common** on your **boot** partition. Copy this file also in
-the root directory of your project.
-
-More info on how to generate this file you will find in the
-`References`_ section or in the **ReadMe.txt** file from **boot** partition.
-
-.. collapsible:: How to build the boot image BOOT.BIN in WSL
-
-   After obtaining **.xsa** file, you must be sure that you have done source for
-   Vivado and Vitis. To create **boot.bin** is recommended to run
-   ``build_boot_bin.sh`` in terminal.To do this, the file can be called in the
-   following manner:
-
-   .. code-block:: bash
-
-        chmod +x build_boot_bin.sh
-        usage: build_boot_bin.sh system_top.xsa u-boot.elf [output-archive]
-
-   You can download the script by accessing the following link:
-   :dokuwiki:`build_boot_bin.sh <resources/tools-software/linux-software/build-the-zynq-boot-image>`.
-
-For Intel FPGAs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
 References
 -------------------------------------------------------------------------------
 
--  :dokuwiki:`How to build the Zynq boot image
-   BOOT.BIN <resources/tools-software/linux-software/build-the-zynq-boot-image>`
--  :dokuwiki:`How to build the ZynqMP boot image
-   BOOT.BIN <resources/tools-software/linux-software/build-the-zynqmp-boot-image>`
--  :dokuwiki:`Building the ADI Linux
-   kernel <resources/tools-software/linux-drivers-all>`
+- :dokuwiki:`Altera SoC quick start guide <resources/tools-software/linux-software/altera_soc_images>`
+- :dokuwiki:`Arria 10 SoC quick start guide <resources/eval/user-guides/ad-fmcomms8-ebz/quickstart/a10soc>`
+- :dokuwiki:`Building the ADI Linux
+  kernel <resources/tools-software/linux-drivers-all>`
 
 Errors, warnings and notes
 -------------------------------------------------------------------------------
